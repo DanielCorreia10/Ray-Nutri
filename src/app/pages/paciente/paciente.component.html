@@ -1,0 +1,114 @@
+<div class="modulo-pacientes">
+  <div class="cabecalho">
+    <h2>Gerenciamento de Pacientes</h2>
+    <button class="btn-primario" (click)="novoPaciente()">+ Novo Paciente</button>
+  </div>
+
+  <div class="barra-busca">
+    <input 
+      type="text" 
+      placeholder="Buscar por nome ou email..." 
+      [(ngModel)]="termoBusca"
+      (input)="buscarPacientes()"
+      class="input-busca">
+  </div>
+
+  <!-- Formulário de Cadastro/Edição -->
+  <div class="formulario-overlay" *ngIf="mostrarFormulario">
+    <div class="formulario-card">
+      <h3>{{ modoEdicao ? 'Editar Paciente' : 'Novo Paciente' }}</h3>
+      
+      <form (ngSubmit)="salvarPaciente()">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome *</label>
+            <input type="text" [(ngModel)]="pacienteAtual.nome" name="nome" required>
+          </div>
+          <div class="form-group">
+            <label>Sobrenome</label>
+            <input type="text" [(ngModel)]="pacienteAtual.sobrenome" name="sobrenome">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Celular *</label>
+            <input type="text" [(ngModel)]="pacienteAtual.celular" name="celular" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="pacienteAtual.email" name="email">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data de Nascimento *</label>
+            <input type="date" [(ngModel)]="pacienteAtual.data_nascimento" name="data_nascimento" required>
+          </div>
+          <div class="form-group">
+            <label>Sexo *</label>
+            <select [(ngModel)]="pacienteAtual.sexo" name="sexo" required>
+              <option value="feminino">Feminino</option>
+              <option value="masculino">Masculino</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Restrição Alimentar</label>
+          <textarea [(ngModel)]="pacienteAtual.restricao_alimentar" name="restricao_alimentar" rows="3"></textarea>
+        </div>
+
+        <div class="form-acoes">
+          <button type="button" class="btn-secundario" (click)="cancelar()">Cancelar</button>
+          <button type="submit" class="btn-primario">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Listagem de Pacientes -->
+  <div class="lista-cards">
+    <div class="paciente-card" *ngFor="let paciente of pacientesFiltrados">
+      <div class="card-header">
+        <h3>{{ paciente.nome }} {{ paciente.sobrenome }}</h3>
+        <div class="card-acoes">
+          <button class="btn-icone" (click)="editarPaciente(paciente)" title="Editar">
+            ✏️
+          </button>
+          <button class="btn-icone" (click)="excluirPaciente(paciente.id_paciente!)" title="Excluir">
+            🗑️
+          </button>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="info-item">
+          <span class="label">Celular:</span>
+          <span>{{ paciente.celular }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Email:</span>
+          <span>{{ paciente.email || 'Não informado' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Data de Nascimento:</span>
+          <span>{{ formatarData(paciente.data_nascimento) }}</span>
+        </div>
+        <div class="info-item" *ngIf="paciente.primeira_consulta">
+          <span class="label">Primeira Consulta:</span>
+          <span>{{ formatarData(paciente.primeira_consulta) }}</span>
+        </div>
+        <div class="info-item" *ngIf="paciente.restricao_alimentar">
+          <span class="label">Restrição:</span>
+          <span class="restricao">{{ paciente.restricao_alimentar }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mensagem-vazia" *ngIf="pacientesFiltrados.length === 0">
+    <p>Nenhum paciente encontrado</p>
+  </div>
+</div>

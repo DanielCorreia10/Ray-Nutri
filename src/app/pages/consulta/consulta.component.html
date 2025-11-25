@@ -1,0 +1,156 @@
+<div class="modulo-consultas">
+  <div class="cabecalho">
+    <h2>Gerenciamento de Consultas</h2>
+    <button class="btn-primario" (click)="novaConsulta()">+ Nova Consulta</button>
+  </div>
+
+  <div class="barra-busca">
+    <input 
+      type="text" 
+      placeholder="Buscar por paciente ou objetivo..." 
+      [(ngModel)]="termoBusca"
+      (input)="buscarConsultas()"
+      class="input-busca">
+  </div>
+
+  <!-- Formulário de Cadastro/Edição -->
+  <div class="formulario-overlay" *ngIf="mostrarFormulario">
+    <div class="formulario-card">
+      <h3>{{ modoEdicao ? 'Editar Consulta' : 'Nova Consulta' }}</h3>
+      
+      <form (ngSubmit)="salvarConsulta()">
+        <div class="form-group">
+          <label>Paciente *</label>
+          <select [(ngModel)]="consultaAtual.id_paciente" name="id_paciente" required>
+            <option value="0">Selecione um paciente</option>
+            <option *ngFor="let paciente of pacientes" [value]="paciente.id_paciente">
+              {{ paciente.nome }} {{ paciente.sobrenome }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data da Consulta *</label>
+            <input type="date" [(ngModel)]="consultaAtual.data_consulta" name="data_consulta" required>
+          </div>
+          <div class="form-group">
+            <label>Horário *</label>
+            <input type="time" [(ngModel)]="consultaAtual.horario_consulta" name="horario_consulta" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo de Consulta *</label>
+            <select [(ngModel)]="consultaAtual.tipo" name="tipo" required>
+              <option value="primeira">Primeira Consulta</option>
+              <option value="retorno">Retorno</option>
+              <option value="avaliacao">Avaliação</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Objetivo *</label>
+            <input type="text" [(ngModel)]="consultaAtual.objetivo" name="objetivo" 
+                   placeholder="Ex: Perda de peso" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Altura (m) *</label>
+            <input type="number" step="0.01" [(ngModel)]="consultaAtual.altura" 
+                   name="altura" (input)="calcularIMC()" placeholder="Ex: 1.65" required>
+          </div>
+          <div class="form-group">
+            <label>Peso Atual (kg) *</label>
+            <input type="number" step="0.1" [(ngModel)]="consultaAtual.peso_atual" 
+                   name="peso_atual" (input)="calcularIMC()" placeholder="Ex: 72.5" required>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="consultaAtual.imc">
+          <label>IMC Calculado</label>
+          <div class="imc-resultado">
+            <span class="imc-valor">{{ consultaAtual.imc }}</span>
+            <span class="imc-classificacao">{{ getClassificacaoIMC(consultaAtual.imc!) }}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Medicações em Uso</label>
+          <textarea [(ngModel)]="consultaAtual.medicacoes_uso" name="medicacoes_uso" 
+                    rows="3" placeholder="Descreva as medicações em uso"></textarea>
+        </div>
+
+        <div class="form-acoes">
+          <button type="button" class="btn-secundario" (click)="cancelar()">Cancelar</button>
+          <button type="submit" class="btn-primario">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Listagem de Consultas -->
+  <div class="lista-cards">
+    <div class="consulta-card" *ngFor="let consulta of consultasFiltradas">
+      <div class="card-header">
+        <div>
+          <h3>{{ consulta.nomePaciente }}</h3>
+          <span class="badge" [class]="'badge-' + consulta.tipo">{{ consulta.tipo }}</span>
+        </div>
+        <div class="card-acoes">
+          <button class="btn-icone" (click)="editarConsulta(consulta)" title="Editar">
+            ✏️
+          </button>
+          <button class="btn-icone" (click)="excluirConsulta(consulta.id_ficha!)" title="Excluir">
+            🗑️
+          </button>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="info-row">
+          <div class="info-item">
+            <span class="label">📅 Data</span>
+            <span>{{ formatarData(consulta.data_consulta) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">🕐 Horário</span>
+            <span>{{ consulta.horario_consulta }}</span>
+          </div>
+        </div>
+        
+        <div class="info-item">
+          <span class="label">🎯 Objetivo</span>
+          <span>{{ consulta.objetivo }}</span>
+        </div>
+
+        <div class="metricas">
+          <div class="metrica">
+            <span class="metrica-label">Altura</span>
+            <span class="metrica-valor">{{ consulta.altura }} m</span>
+          </div>
+          <div class="metrica">
+            <span class="metrica-label">Peso</span>
+            <span class="metrica-valor">{{ consulta.peso_atual }} kg</span>
+          </div>
+          <div class="metrica destaque">
+            <span class="metrica-label">IMC</span>
+            <span class="metrica-valor">{{ consulta.imc }}</span>
+            <span class="metrica-classificacao">{{ getClassificacaoIMC(consulta.imc!) }}</span>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="consulta.medicacoes_uso">
+          <span class="label">💊 Medicações</span>
+          <span>{{ consulta.medicacoes_uso }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mensagem-vazia" *ngIf="consultasFiltradas.length === 0">
+    <p>Nenhuma consulta encontrada</p>
+  </div>
+</div>

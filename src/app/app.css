@@ -1,0 +1,62 @@
+.container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.header {
+  background-color: #ffffff;
+  padding: 1.5rem 3rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h1 {
+  margin: 0;
+  color: #2d6a4f;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.logo p {
+  margin: 0.25rem 0 0 0;
+  color: #ff8c42;
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+.menu {
+  display: flex;
+  gap: 1rem;
+}
+
+.menu a {
+  background-color: transparent;
+  border: 2px solid #e8e8e8;
+  color: #666;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu a:hover {
+  border-color: #2d6a4f;
+  color: #2d6a4f;
+}
+
+.menu a.ativo {
+  background-color: #2d6a4f;
+  border-color: #2d6a4f;
+  color: #ffffff;
+}
+
+.conteudo {
+  padding: 2rem 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
