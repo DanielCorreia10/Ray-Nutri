@@ -3,22 +3,39 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+/* CORREÇÃO: Coloca título e botão na mesma linha e alinha */
 .cabecalho {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  /* Centraliza horizontalmente o grupo título/botão */
   align-items: center;
+  /* Alinha o título e o botão verticalmente */
   margin-bottom: 2rem;
+  padding-top: 3rem;
+  /* Espaçamento após o banner */
+  gap: 2rem;
+  /* Adiciona espaçamento entre o título e o botão */
 }
 
 .cabecalho h2 {
   color: #2d6a4f;
-  font-size: 1.8rem;
-  font-weight: 600;
+  font-size: 2.5rem;
+  /* Mantém o destaque */
+  font-weight: 800;
+  /* Mantém o destaque */
   margin: 0;
+  /* Remove margem inferior para que o botão fique alinhado */
 }
 
 .btn-primario {
@@ -247,17 +264,19 @@
 }
 
 @media (max-width: 768px) {
+
+  /* Em telas menores, o layout volta a ser empilhado para melhor leitura */
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .lista-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .cabecalho {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
   }
 }

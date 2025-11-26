@@ -23,7 +23,11 @@ interface Consulta {
   imc?: number;
   medicacoes_uso?: string;
   id_paciente: number;
-  nomePaciente?: string;
+}
+
+interface PacienteComConsultas extends Paciente {
+  consultas: Consulta[];
+  expandido: boolean;
 }
 
 @Component({
@@ -34,12 +38,12 @@ interface Consulta {
   styleUrls: ['./consulta.component.css']
 })
 export class ConsultaComponent implements OnInit {
-  consultas: Consulta[] = [];
-  consultasFiltradas: Consulta[] = [];
+  pacientesComConsultas: PacienteComConsultas[] = [];
+  pacientesFiltrados: PacienteComConsultas[] = [];
   pacientes: Paciente[] = [];
   mostrarFormulario: boolean = false;
-  modoEdicao: boolean = false;
   termoBusca: string = '';
+  pacienteSelecionadoId: number = 0;
 
   consultaAtual: Consulta = {
     data_consulta: '',
@@ -53,13 +57,11 @@ export class ConsultaComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.carregarPacientes();
-    this.carregarConsultas();
+    this.carregarDados();
   }
 
-  carregarPacientes(): void {
-    // TODO: Substituir por chamada HTTP
-    // this.http.get<Paciente[]>('http://localhost:3000/api/pacientes')
+  carregarDados(): void {
+    // TODO: Substituir por chamadas HTTP
     this.pacientes = [
       {
         id_paciente: 1,
@@ -69,14 +71,19 @@ export class ConsultaComponent implements OnInit {
         data_nascimento: '1990-05-15',
         sexo: 'feminino',
         email: 'maria@email.com'
+      },
+      {
+        id_paciente: 2,
+        nome: 'João',
+        sobrenome: 'Santos',
+        celular: '11976543210',
+        data_nascimento: '1985-08-20',
+        sexo: 'masculino',
+        email: 'joao@email.com'
       }
     ];
-  }
 
-  carregarConsultas(): void {
-    // TODO: Substituir por chamada HTTP
-    // this.http.get<Consulta[]>('http://localhost:3000/api/consultas')
-    this.consultas = [
+    const todasConsultas: Consulta[] = [
       {
         id_ficha: 1,
         data_consulta: '2024-11-25',
@@ -87,23 +94,59 @@ export class ConsultaComponent implements OnInit {
         peso_atual: 72.5,
         imc: 26.6,
         medicacoes_uso: 'Nenhuma',
-        id_paciente: 1,
-        nomePaciente: 'Maria Silva'
+        id_paciente: 1
+      },
+      {
+        id_ficha: 2,
+        data_consulta: '2024-11-20',
+        horario_consulta: '10:00',
+        tipo: 'retorno',
+        objetivo: 'Perda de peso',
+        altura: 1.65,
+        peso_atual: 70.2,
+        imc: 25.8,
+        medicacoes_uso: 'Nenhuma',
+        id_paciente: 1
+      },
+      {
+        id_ficha: 3,
+        data_consulta: '2024-11-22',
+        horario_consulta: '15:30',
+        tipo: 'primeira',
+        objetivo: 'Ganho de massa muscular',
+        altura: 1.78,
+        peso_atual: 75.0,
+        imc: 23.7,
+        medicacoes_uso: 'Whey Protein',
+        id_paciente: 2
       }
     ];
-    this.consultasFiltradas = [...this.consultas];
+
+    this.pacientesComConsultas = this.pacientes.map(paciente => ({
+      ...paciente,
+      consultas: todasConsultas.filter(c => c.id_paciente === paciente.id_paciente)
+        .sort((a, b) => new Date(b.data_consulta).getTime() - new Date(a.data_consulta).getTime()),
+      expandido: false
+    }));
+
+    this.pacientesFiltrados = [...this.pacientesComConsultas];
   }
 
-  buscarConsultas(): void {
+  buscarPacientes(): void {
     const termo = this.termoBusca.toLowerCase();
-    this.consultasFiltradas = this.consultas.filter(c => 
-      c.nomePaciente?.toLowerCase().includes(termo) || 
-      c.objetivo.toLowerCase().includes(termo)
+    this.pacientesFiltrados = this.pacientesComConsultas.filter(p => 
+      p.nome.toLowerCase().includes(termo) || 
+      p.sobrenome.toLowerCase().includes(termo) ||
+      p.email.toLowerCase().includes(termo)
     );
   }
 
-  novaConsulta(): void {
-    this.modoEdicao = false;
+  togglePaciente(paciente: PacienteComConsultas): void {
+    paciente.expandido = !paciente.expandido;
+  }
+
+  novaConsulta(paciente: PacienteComConsultas): void {
+    this.pacienteSelecionadoId = paciente.id_paciente!;
     this.consultaAtual = {
       data_consulta: '',
       horario_consulta: '',
@@ -112,14 +155,14 @@ export class ConsultaComponent implements OnInit {
       altura: 0,
       peso_atual: 0,
       medicacoes_uso: '',
-      id_paciente: 0
+      id_paciente: paciente.id_paciente!
     };
     this.mostrarFormulario = true;
   }
 
   editarConsulta(consulta: Consulta): void {
-    this.modoEdicao = true;
     this.consultaAtual = { ...consulta };
+    this.pacienteSelecionadoId = consulta.id_paciente;
     this.mostrarFormulario = true;
   }
 
@@ -133,35 +176,32 @@ export class ConsultaComponent implements OnInit {
   salvarConsulta(): void {
     this.calcularIMC();
     
-    const pacienteSelecionado = this.pacientes.find(p => p.id_paciente === this.consultaAtual.id_paciente);
-    if (pacienteSelecionado) {
-      this.consultaAtual.nomePaciente = `${pacienteSelecionado.nome} ${pacienteSelecionado.sobrenome}`;
-    }
-
     // TODO: Substituir por chamada HTTP
-    // POST: this.http.post('http://localhost:3000/api/consultas', this.consultaAtual)
-    // PUT: this.http.put(`http://localhost:3000/api/consultas/${id}`, this.consultaAtual)
-
-    if (this.modoEdicao) {
-      const index = this.consultas.findIndex(c => c.id_ficha === this.consultaAtual.id_ficha);
-      if (index !== -1) {
-        this.consultas[index] = { ...this.consultaAtual };
+    if (this.consultaAtual.id_ficha) {
+      // Atualizar
+      const paciente = this.pacientesComConsultas.find(p => p.id_paciente === this.consultaAtual.id_paciente);
+      if (paciente) {
+        const index = paciente.consultas.findIndex(c => c.id_ficha === this.consultaAtual.id_ficha);
+        if (index !== -1) {
+          paciente.consultas[index] = { ...this.consultaAtual };
+        }
       }
     } else {
-      this.consultaAtual.id_ficha = this.consultas.length + 1;
-      this.consultas.push({ ...this.consultaAtual });
+      // Criar
+      const paciente = this.pacientesComConsultas.find(p => p.id_paciente === this.pacienteSelecionadoId);
+      if (paciente) {
+        this.consultaAtual.id_ficha = Date.now();
+        paciente.consultas.unshift({ ...this.consultaAtual });
+      }
     }
     
-    this.consultasFiltradas = [...this.consultas];
     this.cancelar();
   }
 
-  excluirConsulta(id: number): void {
+  excluirConsulta(paciente: PacienteComConsultas, consultaId: number): void {
     if (confirm('Tem certeza que deseja excluir esta consulta?')) {
       // TODO: Substituir por chamada HTTP
-      // DELETE: this.http.delete(`http://localhost:3000/api/consultas/${id}`)
-      this.consultas = this.consultas.filter(c => c.id_ficha !== id);
-      this.consultasFiltradas = [...this.consultas];
+      paciente.consultas = paciente.consultas.filter(c => c.id_ficha !== consultaId);
     }
   }
 
@@ -180,7 +220,7 @@ export class ConsultaComponent implements OnInit {
   }
 
   formatarData(data: string): string {
-    return new Date(data).toLocaleDateString('pt-BR');
+    return new Date(data + 'T00:00:00').toLocaleDateString('pt-BR');
   }
 
   getClassificacaoIMC(imc: number): string {
@@ -188,5 +228,27 @@ export class ConsultaComponent implements OnInit {
     if (imc < 25) return 'Peso normal';
     if (imc < 30) return 'Sobrepeso';
     return 'Obesidade';
+  }
+
+  getCorIMC(imc: number): string {
+    if (imc < 18.5) return '#ffa726';
+    if (imc < 25) return '#66bb6a';
+    if (imc < 30) return '#ff8c42';
+    return '#ef5350';
+  }
+
+  calcularIdade(dataNascimento: string): number {
+    const hoje = new Date();
+    const nascimento = new Date(dataNascimento + 'T00:00:00');
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const m = hoje.getMonth() - nascimento.getMonth();
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+      idade--;
+    }
+    return idade;
+  }
+
+  getTotalConsultas(): number {
+    return this.pacientesComConsultas.reduce((acc, p) => acc + p.consultas.length, 0);
   }
 }
