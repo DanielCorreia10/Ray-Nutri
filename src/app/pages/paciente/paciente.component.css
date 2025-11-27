@@ -20,6 +20,7 @@
   justify-content: center;
   /* Centraliza horizontalmente o grupo título/botão */
   align-items: center;
+  text-align: center;
   /* Alinha o título e o botão verticalmente */
   margin-bottom: 2rem;
   padding-top: 3rem;

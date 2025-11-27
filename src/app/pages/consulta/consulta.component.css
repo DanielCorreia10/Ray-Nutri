@@ -3,13 +3,14 @@
 }
 
 @keyframes fadeInUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(30px); 
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -17,6 +18,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  text-align: center;
   margin-bottom: 2rem;
   padding: 2rem;
   background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
@@ -115,8 +117,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .formulario-card {
@@ -132,13 +139,14 @@
 }
 
 @keyframes slideUp {
-  from { 
+  from {
     opacity: 0;
-    transform: translateY(50px) scale(0.95); 
+    transform: translateY(50px) scale(0.95);
   }
-  to { 
+
+  to {
     opacity: 1;
-    transform: translateY(0) scale(1); 
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -234,8 +242,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
 }
 
 .imc-info {
@@ -271,7 +286,8 @@
   border-top: 2px solid #f0f0f0;
 }
 
-.btn-primario, .btn-secundario {
+.btn-primario,
+.btn-secundario {
   padding: 0.875rem 2rem;
   border-radius: 10px;
   font-size: 1rem;
@@ -471,6 +487,7 @@
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -499,10 +516,13 @@
 }
 
 @keyframes pulse-dot {
-  0%, 100% { 
+
+  0%,
+  100% {
     box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.2);
   }
-  50% { 
+
+  50% {
     box-shadow: 0 0 0 8px rgba(45, 106, 79, 0.1);
   }
 }
@@ -544,7 +564,8 @@
   flex-wrap: wrap;
 }
 
-.data, .hora {
+.data,
+.hora {
   color: #666;
   font-size: 0.9rem;
   font-weight: 500;
